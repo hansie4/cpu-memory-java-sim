@@ -1,7 +1,3 @@
-// TO-DO 
-// * USER PROGRAM CANNOT ACCESS SYSTEM MEMORY
-// * FIX 29 & 30
-// * GET SAMPLE 3 and 4 working
 
 import java.io.File;
 import java.io.FileWriter;
@@ -88,12 +84,9 @@ public class CPU {
             this.timer++;
 
             // RUN INTERUPT SEQUENCE
-            if (this.timer % this.interuptCount == 0 && this.timer != 0) {
+            if (this.timer == this.interuptCount) {
                 this.interupt(false);
-            }
-
-            if (this.timer == 1000) {
-                this.end();
+                this.timer = 0;
             }
 
             // DEBUG
@@ -131,9 +124,16 @@ public class CPU {
 
         this.PC++;
 
-        int value = this.readFromMemory(address);
+        if (!this.isInKernalMode && (address < this.USER_MEMORY_START || address > this.USER_MEMORY_END)) {
+            System.out.println("Memory violation: accessing system address " + address + " in user mode");
+            this.isRunning = false;
+            this.closeStreams();
+            System.exit(1);
+        } else {
+            int value = this.readFromMemory(address);
 
-        this.AC = value;
+            this.AC = value;
+        }
     }
 
     // 3
@@ -142,10 +142,26 @@ public class CPU {
 
         this.PC++;
 
-        int addressToLoadFrom = this.readFromMemory(address);
-        int value = this.readFromMemory(addressToLoadFrom);
+        if (!this.isInKernalMode && (address < this.USER_MEMORY_START || address > this.USER_MEMORY_END)) {
+            System.out.println("Memory violation: accessing system address " + address + " in user mode");
+            this.isRunning = false;
+            this.closeStreams();
+            System.exit(1);
+        } else {
+            int addressToLoadFrom = this.readFromMemory(address);
 
-        this.AC = value;
+            if (!this.isInKernalMode
+                    && (addressToLoadFrom < this.USER_MEMORY_START || addressToLoadFrom > this.USER_MEMORY_END)) {
+                System.out.println("Memory violation: accessing system address " + addressToLoadFrom + " in user mode");
+                this.isRunning = false;
+                this.closeStreams();
+                System.exit(1);
+            } else {
+                int value = this.readFromMemory(addressToLoadFrom);
+
+                this.AC = value;
+            }
+        }
     }
 
     // 4
@@ -154,9 +170,17 @@ public class CPU {
 
         this.PC++;
 
-        int value = this.readFromMemory((address + this.X));
+        if (!this.isInKernalMode
+                && ((address + this.X) < this.USER_MEMORY_START || (address + this.X) > this.USER_MEMORY_END)) {
+            System.out.println("Memory violation: accessing system address " + (address + this.X) + " in user mode");
+            this.isRunning = false;
+            this.closeStreams();
+            System.exit(1);
+        } else {
+            int value = this.readFromMemory((address + this.X));
 
-        this.AC = value;
+            this.AC = value;
+        }
     }
 
     // 5
@@ -165,16 +189,33 @@ public class CPU {
 
         this.PC++;
 
-        int value = this.readFromMemory((address + this.Y));
+        if (!this.isInKernalMode
+                && ((address + this.Y) < this.USER_MEMORY_START || (address + this.Y) > this.USER_MEMORY_END)) {
+            System.out.println("Memory violation: accessing system address " + (address + this.Y) + " in user mode");
+            this.isRunning = false;
+            this.closeStreams();
+            System.exit(1);
+        } else {
+            int value = this.readFromMemory((address + this.Y));
 
-        this.AC = value;
+            this.AC = value;
+        }
     }
 
     // 6
     void loadSpX() {
-        int value = this.readFromMemory(((this.SP + 1) + this.X));
+        if (!this.isInKernalMode && (((this.SP + 1) + this.X) < this.USER_MEMORY_START
+                || ((this.SP + 1) + this.X) > this.USER_MEMORY_END)) {
+            System.out.println(
+                    "Memory violation: accessing system address " + ((this.SP + 1) + this.X) + " in user mode");
+            this.isRunning = false;
+            this.closeStreams();
+            System.exit(1);
+        } else {
+            int value = this.readFromMemory(((this.SP + 1) + this.X));
 
-        this.AC = value;
+            this.AC = value;
+        }
     }
 
     // 7
@@ -183,7 +224,14 @@ public class CPU {
 
         this.PC++;
 
-        this.writeToMemory(this.AC, address);
+        if (!this.isInKernalMode && (address < this.USER_MEMORY_START || address > this.USER_MEMORY_END)) {
+            System.out.println("Memory violation: accessing system address " + address + " in user mode");
+            this.isRunning = false;
+            this.closeStreams();
+            System.exit(1);
+        } else {
+            this.writeToMemory(this.AC, address);
+        }
     }
 
     // 8
@@ -358,9 +406,6 @@ public class CPU {
             }
         } else {
             // INTERUPT CALLS NOT ALLOWED WITHIN KERNAL MODE
-            // System.out.println("INTERUPT CALLS NOT ALLOWED WITHIN KERNAL MODE");
-            // this.isRunning = false;
-            // this.closeStreams();
         }
     }
 
@@ -507,7 +552,6 @@ public class CPU {
     }
 
     void printDebugInfo() {
-        // this.debugPrintWriter.println("----------" + this.timer + "----------");
         this.debugPrintWriter.println("PC: " + this.PC);
         this.debugPrintWriter.println("SP: " + this.SP);
         this.debugPrintWriter.println("IR: " + this.IR);
