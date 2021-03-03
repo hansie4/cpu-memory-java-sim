@@ -310,7 +310,14 @@ public class CPU {
 
         this.PC++;
 
-        this.PC = address;
+        if (!this.isInKernalMode && (address < this.USER_MEMORY_START || address > this.USER_MEMORY_END)) {
+            System.out.println("Memory violation: accessing system address " + address + " in user mode");
+            this.isRunning = false;
+            this.closeStreams();
+            System.exit(1);
+        } else {
+            this.PC = address;
+        }
     }
 
     // 21
@@ -319,8 +326,15 @@ public class CPU {
 
         this.PC++;
 
-        if (this.AC == 0) {
-            this.PC = address;
+        if (!this.isInKernalMode && (address < this.USER_MEMORY_START || address > this.USER_MEMORY_END)) {
+            System.out.println("Memory violation: accessing system address " + address + " in user mode");
+            this.isRunning = false;
+            this.closeStreams();
+            System.exit(1);
+        } else {
+            if (this.AC == 0) {
+                this.PC = address;
+            }
         }
     }
 
@@ -330,8 +344,15 @@ public class CPU {
 
         this.PC++;
 
-        if (this.AC != 0) {
-            this.PC = address;
+        if (!this.isInKernalMode && (address < this.USER_MEMORY_START || address > this.USER_MEMORY_END)) {
+            System.out.println("Memory violation: accessing system address " + address + " in user mode");
+            this.isRunning = false;
+            this.closeStreams();
+            System.exit(1);
+        } else {
+            if (this.AC != 0) {
+                this.PC = address;
+            }
         }
     }
 
@@ -341,11 +362,18 @@ public class CPU {
 
         this.PC++;
 
-        this.writeToMemory(this.PC, this.SP);
+        if (!this.isInKernalMode && (address < this.USER_MEMORY_START || address > this.USER_MEMORY_END)) {
+            System.out.println("Memory violation: accessing system address " + address + " in user mode");
+            this.isRunning = false;
+            this.closeStreams();
+            System.exit(1);
+        } else {
+            this.writeToMemory(this.PC, this.SP);
 
-        this.SP--;
+            this.SP--;
 
-        this.PC = address;
+            this.PC = address;
+        }
     }
 
     // 24
