@@ -1,0 +1,132 @@
+//////////////////// MAIN PROGRAM CODE ////////////////////
+8       // get random number
+
+14      // add 2 to to the random number
+25      // so that the box is atleast size 3
+25
+15
+
+27      // push random number to stack
+
+23      // print top of box
+200
+23      // print middle portion of box
+400
+23      // print bottom of box
+200
+
+50      // end program
+
+/////////////// print top/bottom of box ///////////////
+.200
+1       load 1 as the offset for the stack
+1
+14      copy it to x
+6       get the number of -'s to print from the stack
+14      copy it to x
+
+23      print -
+620
+
+26      decrement x
+15      copy x to ac
+22      jump to 205 if the ac is not equal to 0
+205
+
+23      print new line
+630
+
+24      return
+
+
+/////////////// print one line of edge of box ///////////////
+.300
+1       load 3 as the offset for the number of characters to print
+3
+14      copy it to x
+6       get the number of ' 's to print from the stack
+14      copy it to x
+
+26      decrement it twice to account for the |'s on the ends
+26
+
+23      print |
+610
+
+23      print ' '
+600
+
+26      decrement x
+15      copy x to ac
+22      jump to 309 if the ac is not equal to 0
+309
+
+23      print |
+610
+
+23      print new line
+630
+
+24      return
+
+/////////////// print all edges of box ///////////////
+.400
+1       load 1
+1
+14      CopyToX
+6       LoadSpX  - get parm
+14      CopyToX
+26
+26
+
+15      copy x to ac(this is to preserve the current value of x) 
+27      push it to the stack
+
+23      print the next line of the box
+300
+
+28      pop from the stack to ac
+14      set x to that value
+
+26      decrement x
+15      copy x to ac
+22      jump to 407 if the ac is not equal to 0
+407
+
+24      return
+
+//////////// print ' ' ////////////
+.600
+1       load ' '
+32
+9       output it
+2
+24
+
+//////////// print | ////////////
+.610
+1       load | 
+124
+9       output it
+2
+24
+
+//////////// print - ////////////
+.620
+1       load -
+45
+9       output it
+2
+24
+
+//////////// print new line ////////////
+.630
+1       load '\n'
+10
+9       output it
+2
+24
+
+//////////// INERUPT HANDLER ////////////
+.1000
+30
