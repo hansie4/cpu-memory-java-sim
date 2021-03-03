@@ -606,7 +606,7 @@ public class CPU {
             OutputStream outputStream = proccess.getOutputStream();
 
             // CPU Object
-            CPU cpu = new CPU(inputStream, outputStream, Integer.parseInt(args[1]), true);
+            CPU cpu = new CPU(inputStream, outputStream, Integer.parseInt(args[1]), false);
 
             // Running the program
             cpu.run();

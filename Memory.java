@@ -129,7 +129,7 @@ public class Memory {
     }
 
     public static void main(String[] args) {
-        Memory mem = new Memory(args[0], true);
+        Memory mem = new Memory(args[0], false);
 
         mem.runMemory();
 
