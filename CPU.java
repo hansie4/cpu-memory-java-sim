@@ -382,6 +382,8 @@ public class CPU {
 
         int returnAddress = this.readFromMemory(this.SP);
 
+        this.writeToMemory(0, this.SP);
+
         this.PC = returnAddress;
     }
 
